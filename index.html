@@ -1,0 +1,1698 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeloFácil - Sistema de Gestão</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        /* Animações e Estilos Básicos */
+        .page { display: none; animation: fadeIn 0.5s; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-sans">
+
+    <!-- Tela de Login e Cadastro -->
+    <div id="auth-page" class="page active">
+        <div class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+            <div class="max-w-md w-full bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
+                <div id="login-view">
+                    <h2 class="text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+                        🧊 GeloFácil
+                    </h2>
+                    <p class="text-center text-gray-600 dark:text-gray-300 mt-2">Acesse sua conta</p>
+                    <form id="login-form" class="mt-8 space-y-6">
+                        <div class="rounded-md shadow-sm -space-y-px">
+                            <div>
+                                <input id="login-email" name="email" type="email" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 placeholder-gray-500 text-gray-900 dark:text-white rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email">
+                            </div>
+                            <div>
+                                <input id="login-password" name="password" type="password" required class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 placeholder-gray-500 text-gray-900 dark:text-white rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Senha">
+                            </div>
+                        </div>
+                        <p id="login-error" class="text-red-500 text-sm mt-2"></p>
+                        <div>
+                            <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Entrar
+                            </button>
+                        </div>
+                    </form>
+                    <p class="mt-4 text-center text-sm">
+                        Não tem uma conta?
+                        <a href="#" onclick="toggleAuthView()" class="font-medium text-indigo-600 hover:text-indigo-500">
+                            Registre-se
+                        </a>
+                    </p>
+                </div>
+                <div id="register-view" style="display: none;">
+                    <h2 class="text-center text-3xl font-extrabold text-gray-900 dark:text-white">Criar Conta</h2>
+                     <form id="register-form" class="mt-8 space-y-6">
+                        <div>
+                            <input id="register-email" type="email" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md" placeholder="Email">
+                        </div>
+                        <div>
+                            <input id="register-password" type="password" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-md" placeholder="Senha">
+                        </div>
+                         <p id="register-error" class="text-red-500 text-sm mt-2"></p>
+                        <div>
+                            <button type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                                Registrar
+                            </button>
+                        </div>
+                    </form>
+                    <p class="mt-4 text-center text-sm">
+                        Já tem uma conta?
+                        <a href="#" onclick="toggleAuthView()" class="font-medium text-indigo-600 hover:text-indigo-500">
+                            Faça o login
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Aplicação Principal (Após Login) -->
+    <div id="app-page" class="page">
+        <div class="relative min-h-screen md:flex">
+            <!-- Sidebar -->
+            <aside class="bg-white dark:bg-gray-800 w-64 px-4 py-4 space-y-2 border-r dark:border-gray-700">
+                <h1 class="text-2xl font-bold text-blue-600 dark:text-blue-400 text-center mb-4">🧊 GeloFácil</h1>
+                <nav>
+                    <a href="#" onclick="showSection('dashboard')" class="nav-link flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 bg-gray-200 dark:bg-gray-700 rounded-md">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        Dashboard
+                    </a>
+                    <a href="#" onclick="showSection('vendas')" class="nav-link flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path></svg>
+                        Vendas
+                    </a>
+                    <a href="#" onclick="showSection('estoque')" class="nav-link flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                        Estoque
+                    </a>
+                    <a href="#" onclick="showSection('clientes')" class="nav-link flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                        Clientes
+                    </a>
+                    <a href="#" onclick="showSection('despesas')" class="nav-link flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+                        <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Contas a Pagar
+                    </a>
+                </nav>
+                <div class="absolute bottom-0 left-0 w-full p-4 border-t dark:border-gray-700">
+                    <p id="user-email" class="text-sm text-center text-gray-500 dark:text-gray-400 mb-2"></p>
+                    <button onclick="logout()" class="w-full text-left flex items-center px-4 py-2 text-gray-700 dark:text-gray-200 hover:bg-red-100 dark:hover:bg-red-800 rounded-md">
+                         <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        Sair
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Conteúdo Principal -->
+            <main class="flex-1 p-6 overflow-y-auto">
+                <!-- Seção Estoque -->
+                <div id="estoque-page" class="section">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold">Controle de Estoque</h2>
+                        <button onclick="openModal('product-modal')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow">
+                            + Novo Produto
+                        </button>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-x-auto">
+                        <table class="w-full min-w-[640px] text-left">
+                            <thead>
+                                <tr class="border-b dark:border-gray-700">
+                                    <th class="p-4">Produto</th>
+                                    <th class="p-4">Estoque Atual</th>
+                                    <th class="p-4">Estoque Mínimo</th>
+                                    <th class="p-4">Preço Venda</th>
+                                    <th class="p-4 text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="products-table-body">
+                                <!-- Linhas de produto serão injetadas aqui -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Seção Clientes -->
+                <div id="clientes-page" class="section" style="display: none;">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold">Gestão de Clientes</h2>
+                        <button onclick="openModal('customer-modal')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow">
+                            + Novo Cliente
+                        </button>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-x-auto">
+                        <table class="w-full min-w-[640px] text-left">
+                            <thead>
+                                <tr class="border-b dark:border-gray-700">
+                                    <th class="p-4">Nome</th>
+                                    <th class="p-4">Contato</th>
+                                    <th class="p-4">Email</th>
+                                    <th class="p-4">Telefone</th>
+                                    <th class="p-4">Endereço</th>
+                                    <th class="p-4 text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customers-table-body">
+                                <!-- Linhas de cliente serão injetadas aqui -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Seção Vendas -->
+                <div id="vendas-page" class="section" style="display: none;">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold">Gestão de Vendas</h2>
+                        <button onclick="openModal('sale-modal')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg shadow">
+                            + Nova Venda
+                        </button>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-x-auto">
+                        <table class="w-full min-w-[800px] text-left">
+                            <thead>
+                                <tr class="border-b dark:border-gray-700">
+                                    <th class="p-4">ID</th>
+                                    <th class="p-4">Cliente</th>
+                                    <th class="p-4">Total</th>
+                                    <th class="p-4">Forma Pagamento</th>
+                                    <th class="p-4">Status</th>
+                                    <th class="p-4">Data</th>
+                                    <th class="p-4 text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sales-table-body">
+                                <!-- Linhas de venda serão injetadas aqui -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Seção Dashboard -->
+                <div id="dashboard-page" class="section" style="display: none;">
+                    <div class="mb-4">
+                        <h2 class="text-2xl font-bold">Dashboard</h2>
+                        <p class="text-gray-600 dark:text-gray-400">Visão geral do seu negócio</p>
+                    </div>
+                    
+                    <!-- Cards de Resumo -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                            <div class="flex items-center">
+                                <div class="p-2 rounded-full bg-green-100 dark:bg-green-900">
+                                    <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-xs font-medium text-gray-600 dark:text-gray-400">Faturamento</p>
+                                    <p id="total-revenue" class="text-lg font-bold text-gray-900 dark:text-white">R$ 0,00</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                            <div class="flex items-center">
+                                <div class="p-2 rounded-full bg-blue-100 dark:bg-blue-900">
+                                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-xs font-medium text-gray-600 dark:text-gray-400">Lucro</p>
+                                    <p id="net-profit" class="text-lg font-bold text-gray-900 dark:text-white">R$ 0,00</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                            <div class="flex items-center">
+                                <div class="p-2 rounded-full bg-red-100 dark:bg-red-900">
+                                    <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-xs font-medium text-gray-600 dark:text-gray-400">Custos</p>
+                                    <p id="total-costs" class="text-lg font-bold text-gray-900 dark:text-white">R$ 0,00</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                            <div class="flex items-center">
+                                <div class="p-2 rounded-full bg-purple-100 dark:bg-purple-900">
+                                    <svg class="w-5 h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+                                    </svg>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-xs font-medium text-gray-600 dark:text-gray-400">Vendas</p>
+                                    <p id="total-sales" class="text-lg font-bold text-gray-900 dark:text-white">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Gráficos e Informações -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <!-- Gráfico de Formas de Pagamento -->
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                            <h3 class="text-sm font-semibold mb-3">Formas de Pagamento</h3>
+                            <div class="h-48">
+                                <canvas id="payment-methods-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Gráfico de Tendência de Vendas -->
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                            <h3 class="text-sm font-semibold mb-3">Tendência de Vendas</h3>
+                            <div class="h-48">
+                                <canvas id="sales-trend-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- Ranking de Clientes -->
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                            <h3 class="text-sm font-semibold mb-3">Top Clientes</h3>
+                            <div id="top-customers-list" class="space-y-2 max-h-48 overflow-y-auto">
+                                <!-- Lista será preenchida via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Alertas de Estoque -->
+                    <div class="mt-4">
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+                            <h3 class="text-sm font-semibold mb-3">Alertas de Estoque</h3>
+                            <div id="stock-alerts-list" class="space-y-2">
+                                <!-- Lista será preenchida via JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção Despesas (Contas a Pagar) -->
+                <div id="despesas-page" class="section" style="display: none;">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-3xl font-bold">Contas a Pagar</h2>
+                        <button onclick="openModal('expense-modal')" class="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg shadow">
+                            + Nova Despesa
+                        </button>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-x-auto">
+                        <table class="w-full min-w-[900px] text-left">
+                            <thead>
+                                <tr class="border-b dark:border-gray-700">
+                                    <th class="p-4">Descrição</th>
+                                    <th class="p-4">Fornecedor</th>
+                                    <th class="p-4">Categoria</th>
+                                    <th class="p-4">Valor</th>
+                                    <th class="p-4">Vencimento</th>
+                                    <th class="p-4">Status</th>
+                                    <th class="p-4">Produto Impactado</th>
+                                    <th class="p-4 text-center">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenses-table-body">
+                                <!-- Linhas de despesa serão injetadas aqui -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Modal de Produto (Criar/Editar) -->
+    <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md">
+            <h3 id="modal-title" class="text-2xl font-bold mb-4">Novo Produto</h3>
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+                <div class="mb-4">
+                    <label for="product-name" class="block mb-2">Nome do Produto</label>
+                    <input type="text" id="product-name" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="product-quantity" class="block mb-2">Quantidade</label>
+                        <input type="number" id="product-quantity" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                    </div>
+                    <div>
+                        <label for="product-min-stock" class="block mb-2">Estoque Mínimo</label>
+                        <input type="number" id="product-min-stock" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                    </div>
+                </div>
+                <div class="mb-6">
+                    <label for="product-price" class="block mb-2">Preço de Venda (R$)</label>
+                    <input type="number" step="0.01" id="product-price" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                </div>
+                <div class="flex justify-end gap-4">
+                    <button type="button" onclick="closeModal('product-modal')" class="px-4 py-2 rounded bg-gray-300 dark:bg-gray-600">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded bg-blue-600 text-white">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Cliente (Criar/Editar) -->
+    <div id="customer-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-md">
+            <h3 id="customer-modal-title" class="text-2xl font-bold mb-4">Novo Cliente</h3>
+            <form id="customer-form">
+                <input type="hidden" id="customer-id">
+                <div class="mb-4">
+                    <label for="customer-name" class="block mb-2">Nome do Cliente</label>
+                    <input type="text" id="customer-name" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                </div>
+                <div class="mb-4">
+                    <label for="customer-contact" class="block mb-2">Contato</label>
+                    <input type="text" id="customer-contact" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                </div>
+                <div class="mb-4">
+                    <label for="customer-email" class="block mb-2">Email</label>
+                    <input type="email" id="customer-email" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                </div>
+                <div class="mb-4">
+                    <label for="customer-phone" class="block mb-2">Telefone</label>
+                    <input type="tel" id="customer-phone" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                </div>
+                <div class="mb-6">
+                    <label for="customer-address" class="block mb-2">Endereço</label>
+                    <textarea id="customer-address" rows="3" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600"></textarea>
+                </div>
+                <div class="flex justify-end gap-4">
+                    <button type="button" onclick="closeModal('customer-modal')" class="px-4 py-2 rounded bg-gray-300 dark:bg-gray-600">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded bg-green-600 text-white">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Venda (Criar/Editar) -->
+    <div id="sale-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <h3 id="sale-modal-title" class="text-2xl font-bold mb-4">Nova Venda</h3>
+            <form id="sale-form">
+                <input type="hidden" id="sale-id">
+                
+                <!-- Informações do Cliente -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="sale-customer" class="block mb-2">Cliente</label>
+                        <select id="sale-customer" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                            <option value="">Selecione um cliente</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="sale-payment-method" class="block mb-2">Forma de Pagamento</label>
+                        <select id="sale-payment-method" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                            <option value="">Selecione</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                            <option value="Cartão">Cartão</option>
+                            <option value="PIX">PIX</option>
+                            <option value="Transferência">Transferência</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Status de Pagamento -->
+                <div class="mb-6">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="sale-paid" class="mr-2">
+                        <span>Venda Paga</span>
+                    </label>
+                </div>
+
+                <!-- Itens da Venda -->
+                <div class="mb-6">
+                    <h4 class="text-lg font-semibold mb-4">Itens da Venda</h4>
+                    <div id="sale-items-container">
+                        <div class="sale-item grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                            <div>
+                                <label class="block mb-2">Produto</label>
+                                <select class="sale-product w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                                    <option value="">Selecione um produto</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block mb-2">Quantidade</label>
+                                <input type="number" class="sale-quantity w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" min="1" required>
+                            </div>
+                            <div>
+                                <label class="block mb-2">Preço Unitário (R$)</label>
+                                <input type="number" step="0.01" class="sale-unit-price w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                            </div>
+                            <div class="flex items-end">
+                                <button type="button" onclick="removeSaleItem(this)" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded">Remover</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addSaleItem()" class="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded">
+                        + Adicionar Item
+                    </button>
+                </div>
+
+                <!-- Observações -->
+                <div class="mb-6">
+                    <label for="sale-notes" class="block mb-2">Observações</label>
+                    <textarea id="sale-notes" rows="3" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" placeholder="Observações sobre a venda..."></textarea>
+                </div>
+
+                <!-- Total da Venda -->
+                <div class="mb-6 p-4 bg-gray-100 dark:bg-gray-700 rounded">
+                    <h4 class="text-lg font-semibold">Total da Venda: <span id="sale-total" class="text-green-600">R$ 0,00</span></h4>
+                </div>
+
+                <div class="flex justify-end gap-4">
+                    <button type="button" onclick="closeModal('sale-modal')" class="px-4 py-2 rounded bg-gray-300 dark:bg-gray-600">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded bg-purple-600 text-white">Salvar Venda</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Despesa (Criar/Editar) -->
+    <div id="expense-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl w-full max-w-2xl">
+            <h3 id="expense-modal-title" class="text-2xl font-bold mb-4">Nova Despesa</h3>
+            <form id="expense-form">
+                <input type="hidden" id="expense-id">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="expense-description" class="block mb-2">Descrição</label>
+                        <input type="text" id="expense-description" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                    </div>
+                    <div>
+                        <label for="expense-supplier" class="block mb-2">Fornecedor</label>
+                        <input type="text" id="expense-supplier" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="expense-category" class="block mb-2">Categoria</label>
+                        <select id="expense-category" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                            <option value="">Selecione uma categoria</option>
+                            <option value="Matéria Prima">Matéria Prima</option>
+                            <option value="Energia">Energia</option>
+                            <option value="Água">Água</option>
+                            <option value="Manutenção">Manutenção</option>
+                            <option value="Transporte">Transporte</option>
+                            <option value="Impostos">Impostos</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="expense-amount" class="block mb-2">Valor (R$)</label>
+                        <input type="number" step="0.01" id="expense-amount" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label for="expense-due-date" class="block mb-2">Data de Vencimento</label>
+                        <input type="date" id="expense-due-date" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                    </div>
+                    <div>
+                        <label for="expense-product" class="block mb-2">Produto Impactado (Opcional)</label>
+                        <select id="expense-product" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
+                            <option value="">Nenhum produto específico</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label for="expense-notes" class="block mb-2">Observações</label>
+                    <textarea id="expense-notes" rows="3" class="w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" placeholder="Observações sobre a despesa..."></textarea>
+                </div>
+
+                <div class="mb-6">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="expense-paid" class="mr-2">
+                        <span>Despesa Paga</span>
+                    </label>
+                </div>
+
+                <div class="flex justify-end gap-4">
+                    <button type="button" onclick="closeModal('expense-modal')" class="px-4 py-2 rounded bg-gray-300 dark:bg-gray-600">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded bg-orange-600 text-white">Salvar Despesa</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+    const API_URL = window.location.origin;
+
+    // ===================================================================
+    // FUNÇÕES DE AUTENTICAÇÃO E API
+    // ===================================================================
+
+    function getToken() {
+        return sessionStorage.getItem('accessToken');
+    }
+
+    function setToken(token) {
+        sessionStorage.setItem('accessToken', token);
+    }
+
+    function logout() {
+        sessionStorage.removeItem('accessToken');
+        showPage('auth-page');
+    }
+
+    async function handleLogin(event) {
+        event.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const errorElement = document.getElementById('login-error');
+        errorElement.textContent = '';
+
+        const formData = new FormData();
+        formData.append('username', email);
+        formData.append('password', password);
+
+        try {
+            const response = await fetch(`${API_URL}/token`, {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Falha no login');
+            }
+
+            const data = await response.json();
+            setToken(data.access_token);
+            await initializeApp();
+        } catch (error) {
+            errorElement.textContent = error.message;
+        }
+    }
+
+    async function handleRegister(event) {
+        event.preventDefault();
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        const errorElement = document.getElementById('register-error');
+        errorElement.textContent = '';
+
+        try {
+            const response = await fetch(`${API_URL}/users/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Falha no registro');
+            }
+            
+            alert('Usuário registrado com sucesso! Faça o login.');
+            toggleAuthView(); // Volta para a tela de login
+        } catch (error) {
+            errorElement.textContent = error.message;
+        }
+    }
+
+    async function fetchWithAuth(url, options = {}) {
+        const token = getToken();
+        const headers = {
+            ...options.headers,
+            'Authorization': `Bearer ${token}`
+        };
+
+        const response = await fetch(url, { ...options, headers });
+
+        if (response.status === 401) {
+            logout();
+            throw new Error('Sessão expirada. Faça o login novamente.');
+        }
+        return response;
+    }
+
+    // ===================================================================
+    // LÓGICA DE PRODUTOS
+    // ===================================================================
+    
+    async function loadProducts() {
+        const tableBody = document.getElementById('products-table-body');
+        tableBody.innerHTML = `<tr><td colspan="5" class="text-center p-8"><div class="loader mx-auto"></div></td></tr>`;
+        
+        try {
+            const response = await fetchWithAuth(`${API_URL}/products/`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Falha ao carregar produtos.');
+            }
+            
+            const products = await response.json();
+            renderProducts(products);
+        } catch (error) {
+            tableBody.innerHTML = `<tr><td colspan="5" class="text-center p-8 text-red-500">${error.message}</td></tr>`;
+        }
+    }
+
+    // ===================================================================
+    // LÓGICA DE CLIENTES
+    // ===================================================================
+    
+    async function loadCustomers() {
+        const tableBody = document.getElementById('customers-table-body');
+        tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8"><div class="loader mx-auto"></div></td></tr>`;
+        
+        try {
+            const response = await fetchWithAuth(`${API_URL}/customers/`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Falha ao carregar clientes.');
+            }
+            
+            const customers = await response.json();
+            renderCustomers(customers);
+        } catch (error) {
+            tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-red-500">${error.message}</td></tr>`;
+        }
+    }
+
+    function renderCustomers(customers) {
+        const tableBody = document.getElementById('customers-table-body');
+        tableBody.innerHTML = '';
+        if (customers.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="6" class="text-center p-8 text-gray-500">Nenhum cliente cadastrado.</td></tr>`;
+            return;
+        }
+
+        customers.forEach(c => {
+            const row = `
+                <tr class="border-b dark:border-gray-700">
+                    <td class="p-4 font-semibold">${c.name}</td>
+                    <td class="p-4">${c.contact || '-'}</td>
+                    <td class="p-4">${c.email || '-'}</td>
+                    <td class="p-4">${c.phone || '-'}</td>
+                    <td class="p-4">${c.address || '-'}</td>
+                    <td class="p-4 text-center space-x-2">
+                        <button onclick="editCustomer(${c.id})" class="px-3 py-1 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded">Editar</button>
+                        <button onclick="deleteCustomer(${c.id})" class="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 text-white rounded">Excluir</button>
+                    </td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    async function handleCustomerForm(event) {
+        event.preventDefault();
+        const customerId = document.getElementById('customer-id').value;
+        const customerData = {
+            name: document.getElementById('customer-name').value,
+            contact: document.getElementById('customer-contact').value || null,
+            email: document.getElementById('customer-email').value || null,
+            phone: document.getElementById('customer-phone').value || null,
+            address: document.getElementById('customer-address').value || null
+        };
+
+        const url = customerId ? `${API_URL}/customers/${customerId}` : `${API_URL}/customers/`;
+        const method = customerId ? 'PUT' : 'POST';
+
+        try {
+            const response = await fetchWithAuth(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(customerData)
+            });
+            if (!response.ok) throw new Error('Falha ao salvar cliente.');
+            
+            closeModal('customer-modal');
+            loadCustomers();
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+    
+    async function editCustomer(id) {
+        try {
+            const response = await fetchWithAuth(`${API_URL}/customers/${id}`);
+            if (!response.ok) throw new Error('Cliente não encontrado.');
+            const customer = await response.json();
+
+            document.getElementById('customer-modal-title').textContent = 'Editar Cliente';
+            document.getElementById('customer-id').value = customer.id;
+            document.getElementById('customer-name').value = customer.name;
+            document.getElementById('customer-contact').value = customer.contact || '';
+            document.getElementById('customer-email').value = customer.email || '';
+            document.getElementById('customer-phone').value = customer.phone || '';
+            document.getElementById('customer-address').value = customer.address || '';
+            openModal('customer-modal');
+        } catch(error) {
+            alert(error.message);
+        }
+    }
+
+    async function deleteCustomer(id) {
+        if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
+        
+        try {
+            const response = await fetchWithAuth(`${API_URL}/customers/${id}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) throw new Error('Falha ao excluir cliente.');
+            
+            loadCustomers();
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    // ===================================================================
+    // LÓGICA DE VENDAS
+    // ===================================================================
+    
+    async function loadSales() {
+        const tableBody = document.getElementById('sales-table-body');
+        tableBody.innerHTML = `<tr><td colspan="7" class="text-center p-8"><div class="loader mx-auto"></div></td></tr>`;
+        
+        try {
+            const response = await fetchWithAuth(`${API_URL}/sales/`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Falha ao carregar vendas.');
+            }
+            
+            const sales = await response.json();
+            renderSales(sales);
+        } catch (error) {
+            tableBody.innerHTML = `<tr><td colspan="7" class="text-center p-8 text-red-500">${error.message}</td></tr>`;
+        }
+    }
+
+    function renderSales(sales) {
+        const tableBody = document.getElementById('sales-table-body');
+        tableBody.innerHTML = '';
+        if (sales.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="7" class="text-center p-8 text-gray-500">Nenhuma venda registrada.</td></tr>`;
+            return;
+        }
+
+        sales.forEach(sale => {
+            const row = `
+                <tr class="border-b dark:border-gray-700">
+                    <td class="p-4 font-semibold">#${sale.id}</td>
+                    <td class="p-4">${sale.customer_name}</td>
+                    <td class="p-4 font-semibold">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(sale.total)}</td>
+                    <td class="p-4">${sale.payment_method}</td>
+                    <td class="p-4">
+                        <span class="px-2 py-1 text-xs rounded ${sale.paid ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                            ${sale.paid ? 'Pago' : 'Pendente'}
+                        </span>
+                    </td>
+                    <td class="p-4">${new Date(sale.date).toLocaleDateString('pt-BR')}</td>
+                    <td class="p-4 text-center space-x-2">
+                        <button onclick="viewSale(${sale.id})" class="px-3 py-1 text-sm bg-blue-500 hover:bg-blue-600 text-white rounded">Ver</button>
+                        <button onclick="deleteSale(${sale.id})" class="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 text-white rounded">Excluir</button>
+                    </td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    async function loadCustomersForSale() {
+        try {
+            const response = await fetchWithAuth(`${API_URL}/customers/`);
+            if (!response.ok) throw new Error('Falha ao carregar clientes');
+            const customers = await response.json();
+            
+            const select = document.getElementById('sale-customer');
+            select.innerHTML = '<option value="">Selecione um cliente</option>';
+            customers.forEach(customer => {
+                select.innerHTML += `<option value="${customer.id}">${customer.name}</option>`;
+            });
+        } catch (error) {
+            console.error('Erro ao carregar clientes:', error);
+        }
+    }
+
+    async function loadProductsForSale() {
+        try {
+            const response = await fetchWithAuth(`${API_URL}/products/`);
+            if (!response.ok) throw new Error('Falha ao carregar produtos');
+            const products = await response.json();
+            
+            const selects = document.querySelectorAll('.sale-product');
+            selects.forEach(select => {
+                select.innerHTML = '<option value="">Selecione um produto</option>';
+                products.forEach(product => {
+                    select.innerHTML += `<option value="${product.id}" data-price="${product.price}">${product.name} - R$ ${product.price.toFixed(2)}</option>`;
+                });
+            });
+        } catch (error) {
+            console.error('Erro ao carregar produtos:', error);
+        }
+    }
+
+    function addSaleItem() {
+        const container = document.getElementById('sale-items-container');
+        const newItem = document.createElement('div');
+        newItem.className = 'sale-item grid grid-cols-1 md:grid-cols-4 gap-4 mb-4';
+        newItem.innerHTML = `
+            <div>
+                <label class="block mb-2">Produto</label>
+                <select class="sale-product w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                    <option value="">Selecione um produto</option>
+                </select>
+            </div>
+            <div>
+                <label class="block mb-2">Quantidade</label>
+                <input type="number" class="sale-quantity w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" min="1" required>
+            </div>
+            <div>
+                <label class="block mb-2">Preço Unitário (R$)</label>
+                <input type="number" step="0.01" class="sale-unit-price w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+            </div>
+            <div class="flex items-end">
+                <button type="button" onclick="removeSaleItem(this)" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded">Remover</button>
+            </div>
+        `;
+        container.appendChild(newItem);
+        loadProductsForSale();
+    }
+
+    function removeSaleItem(button) {
+        const items = document.querySelectorAll('.sale-item');
+        if (items.length > 1) {
+            button.closest('.sale-item').remove();
+            calculateSaleTotal();
+        }
+    }
+
+    function calculateSaleTotal() {
+        let total = 0;
+        const items = document.querySelectorAll('.sale-item');
+        items.forEach(item => {
+            const quantity = parseFloat(item.querySelector('.sale-quantity').value) || 0;
+            const unitPrice = parseFloat(item.querySelector('.sale-unit-price').value) || 0;
+            total += quantity * unitPrice;
+        });
+        document.getElementById('sale-total').textContent = `R$ ${total.toFixed(2)}`;
+    }
+
+    async function handleSaleForm(event) {
+        event.preventDefault();
+        
+        const saleData = {
+            customer_id: parseInt(document.getElementById('sale-customer').value),
+            payment_method: document.getElementById('sale-payment-method').value,
+            paid: document.getElementById('sale-paid').checked,
+            notes: document.getElementById('sale-notes').value,
+            items: []
+        };
+
+        // Coletar itens da venda
+        const items = document.querySelectorAll('.sale-item');
+        items.forEach(item => {
+            const productId = item.querySelector('.sale-product').value;
+            const quantity = item.querySelector('.sale-quantity').value;
+            const unitPrice = item.querySelector('.sale-unit-price').value;
+            
+            if (productId && quantity && unitPrice) {
+                saleData.items.push({
+                    product_id: parseInt(productId),
+                    quantity: parseInt(quantity),
+                    unit_price: parseFloat(unitPrice)
+                });
+            }
+        });
+
+        if (saleData.items.length === 0) {
+            alert('Adicione pelo menos um item à venda.');
+            return;
+        }
+
+        try {
+            const response = await fetchWithAuth(`${API_URL}/sales/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(saleData)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Falha ao criar venda.');
+            }
+            
+            closeModal('sale-modal');
+            loadSales();
+            alert('Venda criada com sucesso!');
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    async function deleteSale(id) {
+        if (!confirm('Tem certeza que deseja excluir esta venda?')) return;
+        
+        try {
+            const response = await fetchWithAuth(`${API_URL}/sales/${id}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) throw new Error('Falha ao excluir venda.');
+            
+            loadSales();
+            alert('Venda excluída com sucesso!');
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    // ===================================================================
+    // LÓGICA DE DESPESAS (CONTAS A PAGAR)
+    // ===================================================================
+    
+    async function loadExpenses() {
+        const tableBody = document.getElementById('expenses-table-body');
+        tableBody.innerHTML = `<tr><td colspan="8" class="text-center p-8"><div class="loader mx-auto"></div></td></tr>`;
+        
+        try {
+            const response = await fetchWithAuth(`${API_URL}/expenses/`);
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Falha ao carregar despesas.');
+            }
+            
+            const expenses = await response.json();
+            renderExpenses(expenses);
+        } catch (error) {
+            tableBody.innerHTML = `<tr><td colspan="8" class="text-center p-8 text-red-500">${error.message}</td></tr>`;
+        }
+    }
+
+    function renderExpenses(expenses) {
+        const tableBody = document.getElementById('expenses-table-body');
+        tableBody.innerHTML = '';
+        if (expenses.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="8" class="text-center p-8 text-gray-500">Nenhuma despesa registrada.</td></tr>`;
+            return;
+        }
+
+        expenses.forEach(expense => {
+            const dueDate = new Date(expense.due_date);
+            const today = new Date();
+            const daysUntilDue = expense.days_until_due;
+            
+            let statusClass = '';
+            let statusText = '';
+            
+            if (expense.paid) {
+                statusClass = 'bg-green-100 text-green-800';
+                statusText = 'Pago';
+            } else if (daysUntilDue < 0) {
+                statusClass = 'bg-red-100 text-red-800';
+                statusText = 'Vencido';
+            } else if (daysUntilDue <= 7) {
+                statusClass = 'bg-yellow-100 text-yellow-800';
+                statusText = 'Vence em breve';
+            } else {
+                statusClass = 'bg-blue-100 text-blue-800';
+                statusText = 'Em dia';
+            }
+
+            const row = `
+                <tr class="border-b dark:border-gray-700">
+                    <td class="p-4 font-semibold">${expense.description}</td>
+                    <td class="p-4">${expense.supplier}</td>
+                    <td class="p-4">${expense.category}</td>
+                    <td class="p-4 font-semibold">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(expense.amount)}</td>
+                    <td class="p-4">${dueDate.toLocaleDateString('pt-BR')}</td>
+                    <td class="p-4">
+                        <span class="px-2 py-1 text-xs rounded ${statusClass}">
+                            ${statusText}
+                        </span>
+                    </td>
+                    <td class="p-4">${expense.product_name || '-'}</td>
+                    <td class="p-4 text-center space-x-2">
+                        <button onclick="editExpense(${expense.id})" class="px-3 py-1 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded">Editar</button>
+                        <button onclick="deleteExpense(${expense.id})" class="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 text-white rounded">Excluir</button>
+                    </td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    async function loadProductsForExpense() {
+        try {
+            const response = await fetchWithAuth(`${API_URL}/products/`);
+            if (!response.ok) throw new Error('Falha ao carregar produtos');
+            const products = await response.json();
+            
+            const select = document.getElementById('expense-product');
+            select.innerHTML = '<option value="">Nenhum produto específico</option>';
+            products.forEach(product => {
+                select.innerHTML += `<option value="${product.id}">${product.name}</option>`;
+            });
+        } catch (error) {
+            console.error('Erro ao carregar produtos:', error);
+        }
+    }
+
+    async function handleExpenseForm(event) {
+        event.preventDefault();
+        
+        const expenseData = {
+            description: document.getElementById('expense-description').value,
+            supplier: document.getElementById('expense-supplier').value,
+            category: document.getElementById('expense-category').value,
+            amount: parseFloat(document.getElementById('expense-amount').value),
+            due_date: document.getElementById('expense-due-date').value + 'T00:00:00',
+            notes: document.getElementById('expense-notes').value,
+            product_id: document.getElementById('expense-product').value ? parseInt(document.getElementById('expense-product').value) : null
+        };
+
+        const expenseId = document.getElementById('expense-id').value;
+        const url = expenseId ? `${API_URL}/expenses/${expenseId}` : `${API_URL}/expenses/`;
+        const method = expenseId ? 'PUT' : 'POST';
+
+        try {
+            const response = await fetchWithAuth(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(expenseData)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Falha ao salvar despesa.');
+            }
+            
+            closeModal('expense-modal');
+            loadExpenses();
+            alert('Despesa salva com sucesso!');
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    async function editExpense(id) {
+        try {
+            const response = await fetchWithAuth(`${API_URL}/expenses/${id}`);
+            if (!response.ok) throw new Error('Despesa não encontrada.');
+            const expense = await response.json();
+
+            document.getElementById('expense-modal-title').textContent = 'Editar Despesa';
+            document.getElementById('expense-id').value = expense.id;
+            document.getElementById('expense-description').value = expense.description;
+            document.getElementById('expense-supplier').value = expense.supplier;
+            document.getElementById('expense-category').value = expense.category;
+            document.getElementById('expense-amount').value = expense.amount;
+            document.getElementById('expense-due-date').value = expense.due_date.split('T')[0];
+            document.getElementById('expense-notes').value = expense.notes || '';
+            document.getElementById('expense-product').value = expense.product_id || '';
+            document.getElementById('expense-paid').checked = expense.paid;
+            openModal('expense-modal');
+        } catch(error) {
+            alert(error.message);
+        }
+    }
+
+    async function deleteExpense(id) {
+        if (!confirm('Tem certeza que deseja excluir esta despesa?')) return;
+        
+        try {
+            const response = await fetchWithAuth(`${API_URL}/expenses/${id}`, {
+                method: 'DELETE'
+            });
+            if (!response.ok) throw new Error('Falha ao excluir despesa.');
+            
+            loadExpenses();
+            alert('Despesa excluída com sucesso!');
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
+    function renderProducts(products) {
+        const tableBody = document.getElementById('products-table-body');
+        tableBody.innerHTML = '';
+        if (products.length === 0) {
+            tableBody.innerHTML = `<tr><td colspan="5" class="text-center p-8 text-gray-500">Nenhum produto cadastrado.</td></tr>`;
+            return;
+        }
+
+        products.forEach(p => {
+            const isLowStock = p.quantity <= p.min_stock;
+            const rowClass = isLowStock ? 'bg-yellow-100 dark:bg-yellow-900/50' : '';
+            const row = `
+                <tr class="${rowClass}">
+                    <td class="p-4 font-semibold">${p.name} ${isLowStock ? '<span class="text-xs text-red-500 ml-2">(BAIXO!)</span>' : ''}</td>
+                    <td class="p-4">${p.quantity}</td>
+                    <td class="p-4">${p.min_stock}</td>
+                    <td class="p-4">${new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(p.price)}</td>
+                    <td class="p-4 text-center space-x-2">
+                        <button onclick="editProduct(${p.id})" class="px-3 py-1 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded">Editar</button>
+                    </td>
+                </tr>
+            `;
+            tableBody.innerHTML += row;
+        });
+    }
+
+    async function handleProductForm(event) {
+        event.preventDefault();
+        const productId = document.getElementById('product-id').value;
+        const productData = {
+            name: document.getElementById('product-name').value,
+            quantity: parseInt(document.getElementById('product-quantity').value),
+            min_stock: parseInt(document.getElementById('product-min-stock').value),
+            price: parseFloat(document.getElementById('product-price').value)
+        };
+
+        const url = productId ? `${API_URL}/products/${productId}` : `${API_URL}/products/`;
+        const method = productId ? 'PUT' : 'POST';
+
+        try {
+            const response = await fetchWithAuth(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(productData)
+            });
+            if (!response.ok) throw new Error('Falha ao salvar produto.');
+            
+            closeModal('product-modal');
+            loadProducts();
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+    
+    async function editProduct(id) {
+        try {
+            const response = await fetchWithAuth(`${API_URL}/products/${id}`);
+            if (!response.ok) throw new Error('Produto não encontrado.');
+            const product = await response.json();
+
+            document.getElementById('modal-title').textContent = 'Editar Produto';
+            document.getElementById('product-id').value = product.id;
+            document.getElementById('product-name').value = product.name;
+            document.getElementById('product-quantity').value = product.quantity;
+            document.getElementById('product-min-stock').value = product.min_stock;
+            document.getElementById('product-price').value = product.price;
+            openModal('product-modal');
+        } catch(error) {
+            alert(error.message);
+        }
+    }
+
+
+    // ===================================================================
+    // CONTROLE DE UI E INICIALIZAÇÃO
+    // ===================================================================
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+    }
+
+    function toggleAuthView() {
+        const loginView = document.getElementById('login-view');
+        const registerView = document.getElementById('register-view');
+        const loginError = document.getElementById('login-error');
+        const registerError = document.getElementById('register-error');
+
+        loginError.textContent = '';
+        registerError.textContent = '';
+
+        if (loginView.style.display === 'none') {
+            loginView.style.display = 'block';
+            registerView.style.display = 'none';
+        } else {
+            loginView.style.display = 'none';
+            registerView.style.display = 'block';
+        }
+    }
+
+    function openModal(modalId) {
+        if (modalId === 'product-modal') {
+             // Reset form for new product
+            document.getElementById('modal-title').textContent = 'Novo Produto';
+            document.getElementById('product-form').reset();
+            document.getElementById('product-id').value = '';
+        } else if (modalId === 'customer-modal') {
+            // Reset form for new customer
+            document.getElementById('customer-modal-title').textContent = 'Novo Cliente';
+            document.getElementById('customer-form').reset();
+            document.getElementById('customer-id').value = '';
+        } else if (modalId === 'sale-modal') {
+            // Reset form for new sale
+            document.getElementById('sale-modal-title').textContent = 'Nova Venda';
+            document.getElementById('sale-form').reset();
+            document.getElementById('sale-id').value = '';
+            document.getElementById('sale-items-container').innerHTML = `
+                <div class="sale-item grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <div>
+                        <label class="block mb-2">Produto</label>
+                        <select class="sale-product w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                            <option value="">Selecione um produto</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block mb-2">Quantidade</label>
+                        <input type="number" class="sale-quantity w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" min="1" required>
+                    </div>
+                    <div>
+                        <label class="block mb-2">Preço Unitário (R$)</label>
+                        <input type="number" step="0.01" class="sale-unit-price w-full p-2 border rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600" required>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" onclick="removeSaleItem(this)" class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white rounded">Remover</button>
+                    </div>
+                </div>
+            `;
+            loadCustomersForSale();
+            loadProductsForSale();
+            calculateSaleTotal();
+        } else if (modalId === 'expense-modal') {
+            // Reset form for new expense
+            document.getElementById('expense-modal-title').textContent = 'Nova Despesa';
+            document.getElementById('expense-form').reset();
+            document.getElementById('expense-id').value = '';
+            loadProductsForExpense();
+        }
+        document.getElementById(modalId).classList.remove('hidden');
+        document.getElementById(modalId).classList.add('flex');
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+        document.getElementById(modalId).classList.remove('flex');
+    }
+
+    async function initializeApp() {
+        const token = getToken();
+        if (!token) {
+            showPage('auth-page');
+            return;
+        }
+
+        try {
+            const response = await fetchWithAuth(`${API_URL}/users/me`);
+            if (!response.ok) throw new Error('Sessão inválida');
+            
+            const user = await response.json();
+            document.getElementById('user-email').textContent = user.email;
+            showPage('app-page');
+            showSection('dashboard'); // Carregar dashboard por padrão
+        } catch (error) {
+            logout();
+        }
+    }
+
+    function showSection(section) {
+        // Esconder todas as seções
+        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+        
+        // Mostrar a seção selecionada
+        if (section === 'estoque') {
+            document.getElementById('estoque-page').style.display = 'block';
+            loadProducts();
+        } else if (section === 'clientes') {
+            document.getElementById('clientes-page').style.display = 'block';
+            loadCustomers();
+        } else if (section === 'vendas') {
+            document.getElementById('vendas-page').style.display = 'block';
+            loadSales();
+        } else if (section === 'despesas') {
+            document.getElementById('despesas-page').style.display = 'block';
+            loadExpenses();
+        } else if (section === 'dashboard') {
+            document.getElementById('dashboard-page').style.display = 'block';
+            loadDashboard();
+        }
+        
+        // Atualizar navegação ativa
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('bg-gray-200', 'dark:bg-gray-700');
+            link.classList.add('hover:bg-gray-200', 'dark:hover:bg-gray-700');
+        });
+        
+        // Marcar link ativo
+        const activeLink = document.querySelector(`[onclick="showSection('${section}')"]`);
+        if (activeLink) {
+            activeLink.classList.remove('hover:bg-gray-200', 'dark:hover:bg-gray-700');
+            activeLink.classList.add('bg-gray-200', 'dark:bg-gray-700');
+        }
+    }
+
+    // Variáveis globais para os gráficos
+    let paymentMethodsChart = null;
+    let salesTrendChart = null;
+
+    async function loadDashboard() {
+        try {
+            console.log('Iniciando carregamento do dashboard...');
+            
+            // Aguardar Chart.js carregar
+            let attempts = 0;
+            while (typeof Chart === 'undefined' && attempts < 50) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js não foi carregado após 5 segundos');
+                return;
+            }
+            
+            console.log('Chart.js carregado com sucesso');
+            
+            // Carregar dados financeiros
+            console.log('Carregando dados financeiros...');
+            const financialResponse = await fetchWithAuth(`${API_URL}/dashboard/financial-overview`);
+            const financialData = await financialResponse.json();
+            console.log('Dados financeiros carregados:', financialData);
+            
+            // Atualizar cards de resumo
+            document.getElementById('total-revenue').textContent = `R$ ${financialData.total_revenue.toFixed(2)}`;
+            document.getElementById('net-profit').textContent = `R$ ${financialData.net_profit.toFixed(2)}`;
+            document.getElementById('total-costs').textContent = `R$ ${financialData.total_costs.toFixed(2)}`;
+            document.getElementById('total-sales').textContent = financialData.total_sales;
+            
+            // Carregar dados de formas de pagamento
+            console.log('Carregando dados de formas de pagamento...');
+            const paymentResponse = await fetchWithAuth(`${API_URL}/dashboard/payment-methods`);
+            const paymentData = await paymentResponse.json();
+            console.log('Dados de formas de pagamento carregados:', paymentData);
+            
+            // Criar gráfico de formas de pagamento
+            createPaymentMethodsChart(paymentData);
+            
+            // Carregar tendência de vendas
+            console.log('Carregando dados de tendência de vendas...');
+            const trendResponse = await fetchWithAuth(`${API_URL}/dashboard/sales-trend`);
+            const trendData = await trendResponse.json();
+            console.log('Dados de tendência de vendas carregados:', trendData);
+            
+            // Criar gráfico de tendência
+            createSalesTrendChart(trendData);
+            
+            // Carregar top clientes
+            console.log('Carregando dados de top clientes...');
+            const customersResponse = await fetchWithAuth(`${API_URL}/dashboard/top-customers`);
+            const customersData = await customersResponse.json();
+            console.log('Dados de top clientes carregados:', customersData);
+            
+            // Renderizar top clientes
+            renderTopCustomers(customersData);
+            
+            // Carregar alertas de estoque
+            console.log('Carregando alertas de estoque...');
+            const alertsResponse = await fetchWithAuth(`${API_URL}/dashboard/stock-alerts`);
+            const alertsData = await alertsResponse.json();
+            console.log('Alertas de estoque carregados:', alertsData);
+            
+            // Renderizar alertas
+            renderStockAlerts(alertsData);
+            
+            console.log('Dashboard carregado com sucesso!');
+        } catch (error) {
+            console.error('Erro ao carregar dashboard:', error);
+        }
+    }
+
+    function createPaymentMethodsChart(data) {
+        try {
+            // Verificar se Chart.js está disponível
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js não está carregado');
+                return;
+            }
+            
+            const canvas = document.getElementById('payment-methods-chart');
+            if (!canvas) {
+                console.error('Canvas payment-methods-chart não encontrado');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error('Não foi possível obter o contexto 2D do canvas');
+                return;
+            }
+            
+            // Destruir gráfico anterior se existir
+            if (paymentMethodsChart) {
+                paymentMethodsChart.destroy();
+            }
+            
+            console.log('Criando gráfico de formas de pagamento com dados:', data);
+            
+            paymentMethodsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels || ['Sem dados'],
+                    datasets: [{
+                        data: data.data || [100],
+                        backgroundColor: [
+                            '#3B82F6', // Azul
+                            '#10B981', // Verde
+                            '#F59E0B', // Amarelo
+                            '#EF4444', // Vermelho
+                            '#8B5CF6', // Roxo
+                            '#06B6D4'  // Ciano
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000',
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.parsed.toFixed(1)}%`;
+                            }
+                        }
+                    }
+                }
+            }
+            });
+            
+            console.log('Gráfico de formas de pagamento criado com sucesso');
+        } catch (error) {
+            console.error('Erro ao criar gráfico de formas de pagamento:', error);
+        }
+    }
+
+    function createSalesTrendChart(data) {
+        try {
+            // Verificar se Chart.js está disponível
+            if (typeof Chart === 'undefined') {
+                console.error('Chart.js não está carregado');
+                return;
+            }
+            
+            const canvas = document.getElementById('sales-trend-chart');
+            if (!canvas) {
+                console.error('Canvas sales-trend-chart não encontrado');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error('Não foi possível obter o contexto 2D do canvas');
+                return;
+            }
+            
+            // Destruir gráfico anterior se existir
+            if (salesTrendChart) {
+                salesTrendChart.destroy();
+            }
+            
+            console.log('Criando gráfico de tendência de vendas com dados:', data);
+            
+            salesTrendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels || ['Sem dados'],
+                    datasets: [{
+                        label: 'Vendas (R$)',
+                        data: data.data || [0],
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000',
+                            font: {
+                                size: 10
+                            },
+                            callback: function(value) {
+                                return `R$ ${value}`;
+                            }
+                        },
+                        grid: {
+                            color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: document.documentElement.classList.contains('dark') ? '#ffffff' : '#000000',
+                            font: {
+                                size: 10
+                            }
+                        },
+                        grid: {
+                            color: document.documentElement.classList.contains('dark') ? '#374151' : '#e5e7eb'
+                        }
+                    }
+                }
+            }
+            });
+            
+            console.log('Gráfico de tendência de vendas criado com sucesso');
+        } catch (error) {
+            console.error('Erro ao criar gráfico de tendência de vendas:', error);
+        }
+    }
+
+    function renderTopCustomers(customers) {
+        const container = document.getElementById('top-customers-list');
+        container.innerHTML = '';
+        
+        if (customers.length === 0) {
+            container.innerHTML = '<p class="text-gray-500 dark:text-gray-400 text-center text-xs">Nenhum cliente encontrado</p>';
+            return;
+        }
+        
+        customers.forEach((customer, index) => {
+            const customerElement = document.createElement('div');
+            customerElement.className = 'flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded text-xs';
+            customerElement.innerHTML = `
+                <div class="flex items-center">
+                    <div class="w-6 h-6 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mr-2">
+                        <span class="text-xs font-bold text-blue-600 dark:text-blue-400">${index + 1}</span>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-gray-900 dark:text-white text-xs">${customer.name}</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">${customer.purchase_count} compras</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="font-bold text-green-600 dark:text-green-400 text-xs">R$ ${customer.total_spent.toFixed(2)}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Méd: R$ ${customer.average_ticket.toFixed(2)}</p>
+                </div>
+            `;
+            container.appendChild(customerElement);
+        });
+    }
+
+    function renderStockAlerts(alerts) {
+        const container = document.getElementById('stock-alerts-list');
+        container.innerHTML = '';
+        
+        if (alerts.length === 0) {
+            container.innerHTML = '<p class="text-green-500 dark:text-green-400 text-center text-xs">✅ Estoque em dia!</p>';
+            return;
+        }
+        
+        alerts.forEach(alert => {
+            const alertElement = document.createElement('div');
+            const statusColor = alert.status === 'CRÍTICO' ? 'red' : 'yellow';
+            alertElement.className = `p-2 border-l-4 border-${statusColor}-500 bg-${statusColor}-50 dark:bg-${statusColor}-900 rounded text-xs`;
+            alertElement.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="font-semibold text-gray-900 dark:text-white text-xs">${alert.name}</p>
+                        <p class="text-xs text-gray-600 dark:text-gray-400">
+                            Estoque: ${alert.current_quantity} / Mín: ${alert.min_stock}
+                        </p>
+                    </div>
+                    <span class="px-1 py-0.5 text-xs font-bold rounded-full bg-${statusColor}-100 dark:bg-${statusColor}-800 text-${statusColor}-800 dark:text-${statusColor}-200">
+                        ${alert.status}
+                    </span>
+                </div>
+            `;
+            container.appendChild(alertElement);
+        });
+    }
+
+    // Event Listeners
+    document.getElementById('login-form').addEventListener('submit', handleLogin);
+    document.getElementById('register-form').addEventListener('submit', handleRegister);
+    document.getElementById('product-form').addEventListener('submit', handleProductForm);
+    document.getElementById('customer-form').addEventListener('submit', handleCustomerForm);
+    document.getElementById('sale-form').addEventListener('submit', handleSaleForm);
+    document.getElementById('expense-form').addEventListener('submit', handleExpenseForm);
+
+    // Event listeners para cálculo automático do total da venda
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('sale-quantity') || e.target.classList.contains('sale-unit-price')) {
+            calculateSaleTotal();
+        }
+    });
+
+    // Event listener para preencher preço automaticamente ao selecionar produto
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('sale-product')) {
+            const option = e.target.options[e.target.selectedIndex];
+            const price = option.getAttribute('data-price');
+            if (price) {
+                const unitPriceInput = e.target.closest('.sale-item').querySelector('.sale-unit-price');
+                unitPriceInput.value = price;
+                calculateSaleTotal();
+            }
+        }
+    });
+
+    // Initial Load
+    document.addEventListener('DOMContentLoaded', initializeApp);
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+</html>
